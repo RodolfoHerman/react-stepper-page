@@ -1,13 +1,12 @@
 import React from 'react';
+import Stepper from '../../shared/Stepper';
 
 
 function App() {
 
 
     return (
-        <div>
-            INÍCIO
-        </div>
+        <Stepper />
     );
 }
 
