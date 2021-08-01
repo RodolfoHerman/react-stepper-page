@@ -144,7 +144,7 @@ const Stepper = ({
     principalTitle,
     principalSubTitle,
     progressTitle,
-    stepes = [],
+    steps = [],
 }) => {
     const classes = useStyle();
     const [currentStep, setCurrentStep] = useState(1);
@@ -155,7 +155,7 @@ const Stepper = ({
 
     return <Container maxWidth="lg" disableGutters className={classes.ContainerPrincipal}>
         <div className={classes.ContainerProgressBar}>
-            <StepperProgress currentStep={currentStep} numberOfSteps={5} />
+            <StepperProgress currentStep={currentStep} numberOfSteps={steps.length} />
         </div>
         <div className={classes.ContainerContent}>
             <div className={classes.ContainerLeft}>
@@ -169,32 +169,20 @@ const Stepper = ({
                 <div className="right-passos">
                     <span>{`Passo ${currentStep} de ${5} - ${progressTitle}`}</span>
                 </div>
-                {/* aqui na section vai o transition */}
-                <section className="right-content">
-                    <div className="right-titles">
-                        <h2>Venham onferir oq há de novo nos prodovo nos prodovo nos prod ovo nos produtos</h2>
-                        <h5>Venham onferir oq há de novo nos produtos  há de novo nos produtos  há de novo nos produtos  há de novo nos produtos  há de novo nos produtoss</h5>
-                    </div>
-                    <div className="right-content-show">
-                        <form>
-                            <Grid container>
-                                <Grid item>
-                                    <input></input>
-                                    <input></input>
-                                    <input></input>
-                                    <input></input>
-                                    <input></input>
-                                    <input></input>
-                                </Grid>
-                                <Grid item>
-                                    <button>
-                                        Continuar
-                                    </button>
-                                </Grid>
-                            </Grid>
-                        </form>
-                    </div>
-                </section>
+                {
+                    // https://pedrobern.github.io/react-tiger-transition/demo/glide
+                    steps.map((step, index) => {
+                        return <section className="right-content" key={`stepper_${index}`}>
+                            <div className="right-titles">
+                                <h2>{step.stepTitle}</h2>
+                                <h5>{step.stepSubTitle}</h5>
+                            </div>
+                            <div className="right-content-show">
+                                {step.element}
+                            </div>
+                        </section>
+                    })
+                }
             </div>
         </div>
     </Container>
