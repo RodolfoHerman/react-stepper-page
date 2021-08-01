@@ -139,7 +139,13 @@ const useStyle = makeStyles((theme) => ({
     }
 }));
 
-const Stepper = () => {
+const Stepper = ({
+    imageToShow,
+    principalTitle,
+    principalSubTitle,
+    progressTitle,
+    stepes = [],
+}) => {
     const classes = useStyle();
     const [currentStep, setCurrentStep] = useState(1);
 
@@ -153,15 +159,15 @@ const Stepper = () => {
         </div>
         <div className={classes.ContainerContent}>
             <div className={classes.ContainerLeft}>
-                <div style={{backgroundImage: "url('https://www.w3schools.com/howto/img_girl.jpg')"}} className="left-image"></div>
+                <div style={{backgroundImage: `url("${imageToShow}")`}} className="left-image"></div>
                 <div className="left-titles">
-                    <h2>Venham onferir oq há de novo nos produtos</h2>
-                    <h5>Venham onferir oq há de novo nos produtos  há de novo nos produtos  há de novo nos produtos  há de novo nos produtos  há de novo nos produtos  há de novo nos produtos há de novo nos produtos</h5>
+                    <h2>{principalTitle}</h2>
+                    <h5>{principalSubTitle}</h5>
                 </div>
             </div>
             <div className={classes.ContainerRight}>
                 <div className="right-passos">
-                    <span>Passo 1 de 5</span>
+                    <span>{`Passo ${currentStep} de ${5} - ${progressTitle}`}</span>
                 </div>
                 {/* aqui na section vai o transition */}
                 <section className="right-content">
