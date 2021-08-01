@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Container, Grid, makeStyles } from '@material-ui/core';
+import StepperProgress from './StepperProgress/StepperProgress';
 
 
 const useStyle = makeStyles((theme) => ({
@@ -140,10 +141,15 @@ const useStyle = makeStyles((theme) => ({
 
 const Stepper = () => {
     const classes = useStyle();
+    const [currentStep, setCurrentStep] = useState(1);
+
+    setTimeout(() => {
+        setCurrentStep(2);
+    }, 2000);
 
     return <Container maxWidth="lg" disableGutters className={classes.ContainerPrincipal}>
         <div className={classes.ContainerProgressBar}>
-            PROGRESSO AQUI
+            <StepperProgress currentStep={currentStep} numberOfSteps={5} />
         </div>
         <div className={classes.ContainerContent}>
             <div className={classes.ContainerLeft}>
