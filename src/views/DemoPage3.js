@@ -3,7 +3,7 @@ import React from "react";
 
 
 const DemoPage1 = ({
-    nextStep
+    previousStep
 }) => {
     return <form noValidate autoComplete="off">
         <Grid container>
@@ -31,11 +31,11 @@ const DemoPage1 = ({
             </Grid>
             <Grid item>
                 <Button
-                    onClick={nextStep}
+                    onClick={previousStep}
                     variant="contained" 
-                    color="secondary"
+                    color="primary"
                 >
-                    CONTINUAR
+                    VOLTAR
                 </Button>
             </Grid>
         </Grid>

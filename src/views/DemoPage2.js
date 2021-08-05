@@ -1,7 +1,10 @@
 import { Button, Grid, TextField } from "@material-ui/core";
 import React from "react";
 
-const DemoPage2 = () => {
+const DemoPage2 = ({
+    previousStep,
+    nextStep
+}) => {
     return <form noValidate autoComplete="off">
         <Grid container>
             <Grid item>
@@ -81,9 +84,24 @@ const DemoPage2 = () => {
                 </Grid>
             </Grid>
             <Grid item style={{ marginTop: 20 }}>
-                <Button>
-                    Continuar
-                </Button>
+                <Grid container justifyContent="space-between">
+                    <Button
+                        onClick={previousStep}
+                        variant="contained" 
+                        color="primary"
+                    >
+                        VOLTAR
+                    </Button>
+                    <Button
+                        onClick={nextStep}
+                        variant="contained" 
+                        color="secondary"
+                    >
+                        CONTINUAR
+                    </Button>
+                </Grid>
+                
+                
             </Grid>
         </Grid>
     </form>

@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { Container, Grid, makeStyles } from '@material-ui/core';
+import { Container, makeStyles, Typography } from '@material-ui/core';
 import StepperProgress from './StepperProgress/StepperProgress';
+import { useHistory, useLocation } from "react-router-dom";
+import { parse } from "query-string";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+import PropTypes from "prop-types";
 
 
-const useStyle = makeStyles((theme) => ({
+const useStyle = props => makeStyles((theme) => ({
     ContainerPrincipal: {
         [theme.breakpoints.down('sm')]: {
             padding: "0px 5px",
@@ -14,8 +18,35 @@ const useStyle = makeStyles((theme) => ({
     ContainerProgressBar: {
         width: "100%",
         marginBottom: 10,
-        backgroundColor: "cornflowerblue",
     },
+
+    // Titles
+    TypographyTitles: {
+        lineHeight: "25px",
+        color: "#161616",
+        fontStyle: "normal",
+        fontWeight: "600",
+        fontSize: "20px",
+    },
+
+    // Titles
+    TypographySubTitles: {
+        lineHeight: "17px",
+        color: "#161616",
+        fontStyle: "normal",
+        fontWeight: "400",
+        fontSize: "14px",
+    },
+
+    // Steps
+    TypographySteps: {
+        lineHeight: "17px",
+        color: "#CCCCCC",
+        fontStyle: "normal",
+        fontWeight: "400",
+        fontSize: "14px",
+    },
+
 
     // CONTENT
 
@@ -25,7 +56,6 @@ const useStyle = makeStyles((theme) => ({
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
-        backgroundColor: "black",
     },
 
     // LEFT CONTENT
@@ -55,16 +85,14 @@ const useStyle = makeStyles((theme) => ({
             flexDirection: "column",
             justifyContent: "space-between",
 
-            "& > * ": {
-                margin: 0,
-            }
+            // "& > * ": {
+            //     margin: 0,
+            // }
         },
 
         [theme.breakpoints.down('sm')]: {
             display: "none",
         },
-
-        backgroundColor: "red",
     },
 
     // RIGHT CONTENT
@@ -72,18 +100,23 @@ const useStyle = makeStyles((theme) => ({
     ContainerRight: {
         width: "50%",
         minHeight: "70vh",
+        overflow: "hidden",
 
         display: "flex",
         flexDirection: "column",
 
-        "& .right-passos": {
-            marginBottom: "10px",
+        "& .transition-group": {
+            height: "100%",
+            display: "flex",
+        },
 
-            backgroundColor: "green",
+        "& .right-steps": {
+            marginBottom: "10px",
         },
 
         "& .right-content": {
             height: "100%",
+            width: "100%",
 
             display: "flex",
             justifyContent: "space-between",
@@ -92,7 +125,6 @@ const useStyle = makeStyles((theme) => ({
             "& .right-titles": {
                 display: "flex",
                 flexDirection: "column",
-                marginBottom: "20px",
 
                 "& > * ": {
                     margin: "0px 0px 10px 0px",
@@ -107,9 +139,10 @@ const useStyle = makeStyles((theme) => ({
                 justifyContent: "space-between",
                 flexDirection: "column",
 
-                "& > form": {
+                "& > * ": {
                     height: "100%",
                     width: "100%",
+                    marginTop: 20,
 
                     "& > * ": {
                         height: "100%",
@@ -121,7 +154,6 @@ const useStyle = makeStyles((theme) => ({
                     },
 
                 },
-
             },
         },
 
@@ -129,63 +161,190 @@ const useStyle = makeStyles((theme) => ({
             width: "100%",
             minHeight: "unset !important",
 
-            "& * ": {
+            "& > * ": {
                 height: "unset !important",
                 minHeight: "unset !important",
-            }
+            },
         },
 
-        backgroundColor: "blue",
+        "& .slide-enter": {
+            transform: `translateX(${props.translate}%)`,
+        },
+
+        "& .slide-enter-active": {
+            transform: "translateX(0%)",
+            transition: "transform 1000ms ease-in-out",
+        },
+
+        "& .slide-exit": {
+            display: "none",
+        },
+
+        "& .slide-exit-active": {
+            display: "none",
+        },
     }
 }));
 
+const getTranslateDirection = (isForward) => {
+    return isForward
+        ? { translate: 100 }
+        : { translate: -100 };
+}
+
+const getProgressTitle = (currentStep, length, progressTitle) => {
+    return `Step ${currentStep} of ${length} ${!!progressTitle ? " - ".concat(progressTitle) : ""}`;
+}
+
 const Stepper = ({
     imageToShow,
-    principalTitle,
-    principalSubTitle,
+    title,
+    subTitle,
     progressTitle,
+    isShowProgress = true,
     steps = [],
 }) => {
-    const classes = useStyle();
-    const [currentStep, setCurrentStep] = useState(1);
+    const location = useLocation();
+    const history = useHistory();
+    const currentStep = parseInt(parse(location.search).step) || 1;
+    const [indexStep, setIndexStep] = useState(currentStep);
+    const [principalTitle, setPrincipalTitle] = useState("");
+    const [principalSubTitle, setPrincipalSubTitle] = useState("");
+    const step = steps[currentStep - 1];
+    const [isForward, setIsForward] = useState(true);
+    const classes = useStyle(getTranslateDirection(isForward))();
 
-    setTimeout(() => {
-        setCurrentStep(2);
-    }, 2000);
+    useEffect(() => {
+        if(currentStep >= indexStep) {
+            setIsForward(true);
+            setIndexStep(indexStep + 1);
+        } else {
+            setIsForward(false);
+            setIndexStep(indexStep - 1);
+        }
+
+        setPrincipalTitle(step.title || title);
+        setPrincipalSubTitle(step.subTitle || subTitle);
+
+    }, [currentStep]);
+
+    const nextStep = () => {
+        const next = currentStep + 1;
+
+        if(next <= steps.length) {
+            history.push({
+                pathname: location.pathname,
+                search: `?step=${next}`,
+            })
+        }
+    }
+
+    const previousStep = () => {
+        const previous = currentStep - 1;
+
+        if(previous >= 1) {
+            history.push({
+                pathname: location.pathname,
+                search: previous !== 1 ? `?step=${previous}` : "",
+            })
+        }
+    }
+
+
 
     return <Container maxWidth="lg" disableGutters className={classes.ContainerPrincipal}>
-        <div className={classes.ContainerProgressBar}>
-            <StepperProgress currentStep={currentStep} numberOfSteps={steps.length} />
-        </div>
+        {
+            isShowProgress && <div className={classes.ContainerProgressBar}>
+                <StepperProgress currentStep={currentStep} numberOfSteps={steps.length} />
+            </div>
+        }
         <div className={classes.ContainerContent}>
             <div className={classes.ContainerLeft}>
                 <div style={{backgroundImage: `url("${imageToShow}")`}} className="left-image"></div>
                 <div className="left-titles">
-                    <h2>{principalTitle}</h2>
-                    <h5>{principalSubTitle}</h5>
+                    <Typography
+                        className={classes.TypographyTitles}
+                        variant="h1"
+                    >
+                        { principalTitle }
+                    </Typography>
+                    <Typography
+                        className={classes.TypographySubTitles}
+                        variant="subtitle1"
+                    >
+                        { principalSubTitle }
+                    </Typography>
                 </div>
             </div>
             <div className={classes.ContainerRight}>
-                <div className="right-passos">
-                    <span>{`Passo ${currentStep} de ${5} - ${progressTitle}`}</span>
-                </div>
                 {
-                    // https://pedrobern.github.io/react-tiger-transition/demo/glide
-                    steps.map((step, index) => {
-                        return <section className="right-content" key={`stepper_${index}`}>
+                    isShowProgress && <div className="right-steps">
+                        <Typography
+                            className={classes.TypographySteps}
+                            variant="subtitle2"
+                        >
+                            { getProgressTitle(currentStep, steps.length, progressTitle) }
+                        </Typography>
+                    </div>
+                }
+
+                <TransitionGroup
+                    component="div"
+                    className="transition-group"
+                >
+                    <CSSTransition
+                        key={currentStep}
+                        timeout={{ enter: 2000, exit: 1000 }}
+                        classNames="slide"
+                        mountOnEnter={false}
+                        unmountOnExit={true}
+                    >
+                        <section className="right-content">
                             <div className="right-titles">
-                                <h2>{step.stepTitle}</h2>
-                                <h5>{step.stepSubTitle}</h5>
+                                <Typography
+                                    className={classes.TypographyTitles}
+                                    variant="h2"
+                                >
+                                    { step.header }
+                                </Typography>
+                                <Typography
+                                    className={classes.TypographySubTitles}
+                                    variant="h2"
+                                >
+                                    { step.subHeader }
+                                </Typography>
                             </div>
                             <div className="right-content-show">
-                                {step.element}
+                                <step.element 
+                                    nextStep={nextStep}
+                                    previousStep={previousStep}
+                                    currentStep={currentStep}
+                                    {...step}
+                                />
                             </div>
                         </section>
-                    })
-                }
+                    </CSSTransition>
+                </TransitionGroup>
             </div>
         </div>
     </Container>
+}
+
+Stepper.propTypes = {
+    imageToShow: PropTypes.string.isRequired,
+    title: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+    subTitle: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+    progressTitle: PropTypes.string,
+    isShowProgress: PropTypes.bool,
+    steps: PropTypes.arrayOf(
+        PropTypes.shape({
+            title: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+            subTitle: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+            header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+            subHeader: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+            element: PropTypes.func.isRequired,
+        })
+    ),
 }
 
 export default Stepper;
