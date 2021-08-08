@@ -224,6 +224,7 @@ const Stepper = ({
 
         setPrincipalTitle(step.title || title);
         setPrincipalSubTitle(step.subTitle || subTitle);
+        window.scroll(0,0);
 
     }, [currentStep]);
 
