@@ -27,7 +27,7 @@ const StepPage = () => {
                 element: (props) => <DemoPage3 {...props} />,
                 header: "My Steps 3 Demo",
                 subHeader: "Checking the Step 3 Subtitle demo. The important thing is for the change to take place.",
-                subTitle: "The Son dictates the change of title"
+                subTitle: "The Son dictates the change of titles"
             },
         ]}
     />

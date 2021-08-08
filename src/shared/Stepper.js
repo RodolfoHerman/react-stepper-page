@@ -16,6 +16,7 @@ const useStyle = props => makeStyles((theme) => ({
     },
 
     ContainerProgressBar: {
+        display: props.isShowProgress ? "block" : "none",
         width: "100%",
         marginBottom: 10,
     },
@@ -64,7 +65,7 @@ const useStyle = props => makeStyles((theme) => ({
         height: "70vh",
         width: "45%",
 
-        display: "flex",
+        display: props.isShowImage ? "flex" : "none",
         flexDirection: "column",
         justifyContent: "space-between",
 
@@ -84,10 +85,6 @@ const useStyle = props => makeStyles((theme) => ({
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-
-            // "& > * ": {
-            //     margin: 0,
-            // }
         },
 
         [theme.breakpoints.down('sm')]: {
@@ -98,8 +95,8 @@ const useStyle = props => makeStyles((theme) => ({
     // RIGHT CONTENT
 
     ContainerRight: {
-        width: "50%",
-        minHeight: "70vh",
+        width: props.isShowImage ? "50%" : "100%",
+        minHeight: props.isShowImage ? "70vh" : "unset",
         overflow: "hidden",
 
         display: "flex",
@@ -111,6 +108,7 @@ const useStyle = props => makeStyles((theme) => ({
         },
 
         "& .right-steps": {
+            display: props.isShowProgress ? "block" : "none",
             marginBottom: "10px",
         },
 
@@ -153,6 +151,10 @@ const useStyle = props => makeStyles((theme) => ({
                         flexDirection: "column",
                     },
 
+                    "& button": {
+                        marginTop: 10,
+                    }
+
                 },
             },
         },
@@ -186,12 +188,6 @@ const useStyle = props => makeStyles((theme) => ({
     }
 }));
 
-const getTranslateDirection = (isForward) => {
-    return isForward
-        ? { translate: 100 }
-        : { translate: -100 };
-}
-
 const getProgressTitle = (currentStep, length, progressTitle) => {
     return `Step ${currentStep} of ${length} ${!!progressTitle ? " - ".concat(progressTitle) : ""}`;
 }
@@ -212,7 +208,9 @@ const Stepper = ({
     const [principalSubTitle, setPrincipalSubTitle] = useState("");
     const step = steps[currentStep - 1];
     const [isForward, setIsForward] = useState(true);
-    const classes = useStyle(getTranslateDirection(isForward))();
+    const translate = isForward ? 100 : -100;
+    const isShowImage = !!imageToShow;
+    const classes = useStyle({ translate, isShowImage, isShowProgress })();
 
     useEffect(() => {
         if(currentStep >= indexStep) {
@@ -250,14 +248,10 @@ const Stepper = ({
         }
     }
 
-
-
     return <Container maxWidth="lg" disableGutters className={classes.ContainerPrincipal}>
-        {
-            isShowProgress && <div className={classes.ContainerProgressBar}>
-                <StepperProgress currentStep={currentStep} numberOfSteps={steps.length} />
-            </div>
-        }
+        <div className={classes.ContainerProgressBar}>
+            <StepperProgress currentStep={currentStep} numberOfSteps={steps.length} />
+        </div>
         <div className={classes.ContainerContent}>
             <div className={classes.ContainerLeft}>
                 <div style={{backgroundImage: `url("${imageToShow}")`}} className="left-image"></div>
@@ -277,17 +271,14 @@ const Stepper = ({
                 </div>
             </div>
             <div className={classes.ContainerRight}>
-                {
-                    isShowProgress && <div className="right-steps">
-                        <Typography
-                            className={classes.TypographySteps}
-                            variant="subtitle2"
-                        >
-                            { getProgressTitle(currentStep, steps.length, progressTitle) }
-                        </Typography>
-                    </div>
-                }
-
+                <div className="right-steps">
+                    <Typography
+                        className={classes.TypographySteps}
+                        variant="subtitle2"
+                    >
+                        { getProgressTitle(currentStep, steps.length, progressTitle) }
+                    </Typography>
+                </div>
                 <TransitionGroup
                     component="div"
                     className="transition-group"
@@ -331,7 +322,7 @@ const Stepper = ({
 }
 
 Stepper.propTypes = {
-    imageToShow: PropTypes.string.isRequired,
+    imageToShow: PropTypes.string,
     title: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     subTitle: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     progressTitle: PropTypes.string,
