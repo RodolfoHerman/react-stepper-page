@@ -30,7 +30,7 @@ const useStyle = props => makeStyles((theme) => ({
         fontSize: "20px",
     },
 
-    // Titles
+    // Subtitles
     TypographySubTitles: {
         lineHeight: "17px",
         color: "#161616",
@@ -198,6 +198,7 @@ const Stepper = ({
     subTitle,
     progressTitle,
     isShowProgress = true,
+    containerMaxWidth = "lg",
     steps = [],
 }) => {
     const location = useLocation();
@@ -248,7 +249,7 @@ const Stepper = ({
         }
     }
 
-    return <Container maxWidth="lg" disableGutters className={classes.ContainerPrincipal}>
+    return <Container maxWidth={containerMaxWidth} disableGutters={!!containerMaxWidth} className={classes.ContainerPrincipal}>
         <div className={classes.ContainerProgressBar}>
             <StepperProgress currentStep={currentStep} numberOfSteps={steps.length} />
         </div>
@@ -327,6 +328,7 @@ Stepper.propTypes = {
     subTitle: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
     progressTitle: PropTypes.string,
     isShowProgress: PropTypes.bool,
+    containerMaxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
     steps: PropTypes.arrayOf(
         PropTypes.shape({
             title: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
